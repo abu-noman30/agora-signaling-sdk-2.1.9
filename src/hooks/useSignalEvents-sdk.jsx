@@ -1,24 +1,21 @@
+import { generateRTMToken } from '@/utils/generateRTMToken';
 import { rtmConfig } from '@/utils/signaling.config';
 import AgoraRTM from 'agora-rtm-sdk';
 import { useState } from 'react';
 
-// The Signaling RTMEngine instance
 let signalEngine = null;
-let signalChannel = null;
 
-export default function SignalingRoom() {
+export default function useSignalEvents() {
 	const [isDoctorLoggedIn, setIsDoctorLoggedIn] = useState(false);
 	const [isPatientLoggedIn, setIsPatientLoggedIn] = useState(false);
-
 	const [patientQueue, setPatientQueue] = useState([]);
-
 	const [eventCallback, setEventCallback] = useState({});
 	const [messageCallback, setMessageCallback] = useState({});
 
-	const setupSignalingEngine = async (uid, token) => {
+	const setupSignalingEngine = async (uid) => {
 		try {
 			signalEngine = new AgoraRTM.RTM(rtmConfig?.appId, uid, {
-				token: token
+				token: generateRTMToken(uid)
 			});
 
 			signalingPresenceEvent();
@@ -39,17 +36,15 @@ export default function SignalingRoom() {
 				withLock: true
 			};
 
-			const subscribeRes = await signalEngine.subscribe(rtmConfig?.channelName, subscribeOptions);
-
-			console.log('subscribeRes:', subscribeRes);
+			await signalEngine.subscribe(rtmConfig?.channelName, subscribeOptions);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	const signalDoctorLogin = async (uid, token) => {
+	const signalDoctorLogin = async (uid) => {
 		try {
-			await setupSignalingEngine(uid, token);
+			await setupSignalingEngine(uid);
 			if (!!signalEngine) {
 				await signalEngine.login();
 				await subscribeChannel();
@@ -60,9 +55,9 @@ export default function SignalingRoom() {
 		}
 	};
 
-	const signalPatientLogin = async (uid, token) => {
+	const signalPatientLogin = async (uid) => {
 		try {
-			await setupSignalingEngine(uid, token);
+			await setupSignalingEngine(uid);
 			if (!!signalEngine) {
 				await signalEngine.login();
 				await subscribeChannel();
@@ -78,31 +73,23 @@ export default function SignalingRoom() {
 
 		signalEngine.addEventListener('presence', (eventArgs) => {
 			if (eventArgs.eventType === 'SNAPSHOT') {
-				console.log('Snapshot Event:', eventArgs);
-				setEventCallback({
-					eventArgs
-				});
+				console.log('[SNAPSHOT Event]:', eventArgs);
+				setEventCallback(eventArgs);
 			}
 			// Update the queue state based on the event type (REMOTE_JOIN)
 			else if (eventArgs.eventType === 'REMOTE_JOIN') {
-				console.log('Remote Join Event:', eventArgs);
-				setEventCallback({
-					eventArgs
-				});
-				setPatientQueue((prevQueue) => [...prevQueue, eventArgs.publisher]);
+				console.log('[REMOTE_JOIN Event]:', eventArgs);
+				setEventCallback(eventArgs);
+				setPatientQueue((prevQueue) => [...new Set([...prevQueue, eventArgs.publisher])]);
 			}
 			// Update the queue state based on the event type (REMOTE_LEAVE )
 			else if (eventArgs.eventType === 'REMOTE_LEAVE') {
-				console.log('Remote Leave Event:', eventArgs);
-				setEventCallback({
-					eventArgs
-				});
+				console.log('[REMOTE_LEAVE Event]:', eventArgs);
+				setEventCallback(eventArgs);
 				setPatientQueue((prevQueue) => prevQueue.filter((user) => user !== eventArgs.publisher));
 			} else {
 				console.log('Presence Event:', eventArgs);
-				setEventCallback({
-					eventArgs
-				});
+				setEventCallback(eventArgs);
 			}
 		});
 	};
@@ -111,7 +98,7 @@ export default function SignalingRoom() {
 		if (!signalEngine) return;
 		signalEngine.addEventListener('message', (eventArgs) => {
 			console.log('Message Event:', eventArgs);
-			setMessageCallback({ eventArgs, message: JSON.parse(eventArgs.message) });
+			setMessageCallback({ ...eventArgs, message: { ...JSON.parse(eventArgs.message) } });
 		});
 	};
 
@@ -126,7 +113,7 @@ export default function SignalingRoom() {
 		}
 	};
 
-	const getOnlineUsersInChannel = async () => {
+	const getOnlineUsersInChannel = async (channelName) => {
 		try {
 			if (!signalEngine) return;
 
@@ -179,7 +166,7 @@ export default function SignalingRoom() {
 		}
 	};
 
-	const declineCallInvitation = async (privateChannel) => { 
+	const declineCallInvitation = async (privateChannel) => {
 		try {
 			if (!signalEngine) return;
 
@@ -197,8 +184,19 @@ export default function SignalingRoom() {
 		} catch (error) {
 			console.error('Error declining call invitation:', error);
 		}
-	
-	}
+	};
+
+	const notAnsweringCall = async (privateChannel) => {
+		const message = JSON.stringify({
+			type: 'call-not-answered',
+			from: privateChannel?.message?.from,
+			to: privateChannel?.message?.to,
+			channelName: privateChannel?.message?.channelName
+		});
+
+		// Send a private message to the user with the UserID "Lily"
+		await signalEngine.publish(privateChannel?.message?.channelName, message);
+	};
 
 	return {
 		isDoctorLoggedIn,
@@ -209,6 +207,7 @@ export default function SignalingRoom() {
 		sendCallInvitation,
 		acceptCallInvitation,
 		declineCallInvitation,
+		notAnsweringCall,
 		eventCallback,
 		messageCallback,
 		getUserSubscribeChannels,

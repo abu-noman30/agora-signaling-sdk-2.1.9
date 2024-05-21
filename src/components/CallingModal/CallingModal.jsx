@@ -7,23 +7,30 @@ function CallingModal({
 	acceptCallInvitation,
 	getUserSubscribeChannels,
 	getOnlineUsersInChannel,
-	declineCallInvitation
+	declineCallInvitation,
+	setIsPatientResponding,
+	audioRef
 }) {
 	// const { contentObject, acceptInvitation, declineInvitation } = remoteInvitationResponse;
 
 	const router = useRouter();
 
 	const joinConferenceHandler = () => {
+		audioRef.current.pause();
 		acceptCallInvitation(messageCallback);
+		setIsPatientResponding(true);
 
-		/* setTimeout(() => {
+		setTimeout(() => {
 			router.push('/video-conference');
-		}, 3000); */
-  };
-  
-  const declineCallInvitationHandler = () => { 
-    declineCallInvitation(messageCallback);
-  };
+		}, 3000);
+	};
+
+	const declineCallInvitationHandler = () => {
+		audioRef.current.pause();
+		declineCallInvitation(messageCallback);
+		setIsPatientResponding(true);
+		router.push('/');
+	};
 	return (
 		<div className='w-full min-h-screen flex items-center justify-center bg-gray-300 absolute z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
 			<div className='max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow'>
@@ -48,7 +55,7 @@ function CallingModal({
 					<button
 						className='w-full cursor-pointer border-2 border-black p-1'
 						onClick={() => getUserSubscribeChannels(messageCallback?.message?.to)}>
-						Subscribe User Channel
+						Subscribe Channels
 					</button>
 					<button
 						className='w-full cursor-pointer border-2 border-black p-1'

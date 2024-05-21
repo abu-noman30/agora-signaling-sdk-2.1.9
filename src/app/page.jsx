@@ -13,17 +13,29 @@ export default function Home() {
 							pathname: '/doctor-portal-sdk'
 						}}>
 						<button className='border-2 border-black rounded-lg p-2 font-bold text-sm'>
-							Doctor Portal - Call Patient
+							Doctor Portal (1) - Call Patient
 						</button>
 					</Link>
-					<Link
-						href={{
-							pathname: '/patient-portal-sdk'
-						}}>
-						<button className='border-2 border-black rounded-lg p-2 font-bold text-sm'>
-							Patient Portal - Connect Doctor
-						</button>
-					</Link>
+					<div className='flex flex-col gap-5 border-2 border-gray-200 p-5 rounded-md'>
+						<Link
+							href={{
+								pathname: '/patient-portal-sdk',
+								query: { patientId: 2 }
+							}}>
+							<button className='border-2 border-black rounded-lg p-2 font-bold text-sm'>
+								Patient Portal (2) - Connect Doctor
+							</button>
+						</Link>
+						<Link
+							href={{
+								pathname: '/patient-portal-sdk',
+								query: { patientId: 3 }
+							}}>
+							<button className='border-2 border-black rounded-lg p-2 font-bold text-sm'>
+								Patient Portal (3) - Connect Doctor
+							</button>
+						</Link>
+					</div>
 				</div>
 			</div>
 		</main>
