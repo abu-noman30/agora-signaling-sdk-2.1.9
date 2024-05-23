@@ -1,11 +1,13 @@
 'use client';
 import useSignalEvents from '@/hooks/useSignalEvents-sdk';
 import { callInvitation } from '@/utils/constants/constans';
-import { useRouter } from 'next/navigation';
+import { rtmConfig } from '@/utils/signaling.config';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
+import { useNetworkQuality } from "agora-rtc-react";
 
 function DoctorCallingPatient() {
-	const doctorId = '1';
+	const doctorId = useSearchParams().get('uid');
 	const {
 		eventCallback,
 		messageCallback,
@@ -13,12 +15,16 @@ function DoctorCallingPatient() {
 		patientQueue,
 		sendCallInvitation,
 		getUserSubscribeChannels,
-		getOnlineUsersInChannel
+		getOnlineUsersInChannel,
+		setUserStatus
 	} = useSignalEvents();
 
 	const wasCalled = useRef(false);
 	const router = useRouter();
 	const audioRef = useRef(new Audio('ringtone.mp3'));
+	// const networkQuality = useNetworkQuality();
+
+	// console.log('Network Quality:', networkQuality);
 
 	const callRingtone = () => {
 		audioRef.current.play();
@@ -60,6 +66,8 @@ function DoctorCallingPatient() {
 		}
 	}, [patientQueue]);
 
+
+
 	// console.log('[Doctor]: Event Callback', messageCallback);
 	// console.log('[Doctor]: Message Callback', messageCallback);
 
@@ -73,7 +81,7 @@ function DoctorCallingPatient() {
 				</button>
 				<button
 					className='border-2 rounded-md p-2 bg-blue-800 text-white w-full'
-					onClick={() => getOnlineUsersInChannel(doctorId)}>
+					onClick={() => getOnlineUsersInChannel(rtmConfig?.channelName)}>
 					Channel Online Users
 				</button>
 			</div>

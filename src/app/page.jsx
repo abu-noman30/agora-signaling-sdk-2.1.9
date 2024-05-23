@@ -10,7 +10,8 @@ export default function Home() {
 				<div className='flex items-center justify-center gap-10 w-full'>
 					<Link
 						href={{
-							pathname: '/doctor-portal-sdk'
+							pathname: '/doctor-portal-sdk',
+							query: { uid: 1 }
 						}}>
 						<button className='border-2 border-black rounded-lg p-2 font-bold text-sm'>
 							Doctor Portal (1) - Call Patient
@@ -20,7 +21,7 @@ export default function Home() {
 						<Link
 							href={{
 								pathname: '/patient-portal-sdk',
-								query: { patientId: 2 }
+								query: { uid: 2 }
 							}}>
 							<button className='border-2 border-black rounded-lg p-2 font-bold text-sm'>
 								Patient Portal (2) - Connect Doctor
@@ -29,7 +30,7 @@ export default function Home() {
 						<Link
 							href={{
 								pathname: '/patient-portal-sdk',
-								query: { patientId: 3 }
+								query: { uid: 3 }
 							}}>
 							<button className='border-2 border-black rounded-lg p-2 font-bold text-sm'>
 								Patient Portal (3) - Connect Doctor

@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import CallingModal from '../CallingModal/CallingModal';
 
 function PatientWaiting() {
-	const patientId = useSearchParams().get('patientId');
+	const patientId = useSearchParams().get('uid');
 	const {
 		isPatientLoggedIn,
 		eventCallback,

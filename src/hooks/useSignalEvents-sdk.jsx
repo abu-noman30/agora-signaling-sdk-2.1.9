@@ -87,7 +87,11 @@ export default function useSignalEvents() {
 				console.log('[REMOTE_LEAVE Event]:', eventArgs);
 				setEventCallback(eventArgs);
 				setPatientQueue((prevQueue) => prevQueue.filter((user) => user !== eventArgs.publisher));
-			} else {
+			} else if (eventArgs.eventType === 'REMOTE_STATE_CHANGED') { 
+				console.log('[REMOTE_STATE_CHANGED Event]:', eventArgs);
+				setEventCallback(eventArgs);
+			}
+				else {
 				console.log('Presence Event:', eventArgs);
 				setEventCallback(eventArgs);
 			}
@@ -198,6 +202,37 @@ export default function useSignalEvents() {
 		await signalEngine.publish(privateChannel?.message?.channelName, message);
 	};
 
+	const setUserStatus = async (status, channelName, channelType) => {
+		try {
+			if (!signalEngine) return;
+
+			const status = {"mood":"pumped", "isTyping": "false"};
+			const result = await signalEngine.presence.setState(rtmConfig?.channelName, "MESSAGE", status);
+			console.log('Set User Status:', result);
+		} catch (error) {
+			console.error('Error setting user status:', error);
+		}
+	};
+
+	const getUserStatus = async (userId, channelName, channelType) => {
+		try {
+			const result = await signalEngine.presence.getState(userId,
+				channelName, channelType);
+			console.log('Get User State:', result);
+		} catch (error) {
+				console.log(error);
+		}
+	};
+
+	const removeUserStatus = async (channelName, channelType) => {
+		try {
+			const result = await signalEngine.presence.removeState(channelName, channelType);
+			console.log('Remove User State:', result);
+		} catch (error) {
+			console.error('Error removing user status:', error);
+		}
+	};
+
 	return {
 		isDoctorLoggedIn,
 		isPatientLoggedIn,
@@ -211,6 +246,8 @@ export default function useSignalEvents() {
 		eventCallback,
 		messageCallback,
 		getUserSubscribeChannels,
-		getOnlineUsersInChannel
+		getOnlineUsersInChannel,
+		setUserStatus,
+		getUserStatus
 	};
 }

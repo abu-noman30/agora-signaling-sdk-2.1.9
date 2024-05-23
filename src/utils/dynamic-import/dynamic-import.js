@@ -4,6 +4,9 @@ export const DoctorCallingPatient = dynamic(() => import('@/components/Signaling
 	ssr: false
 });
 export const PatientWaiting = dynamic(() => import('@/components/SignalingSDK/patient-waiting'), { ssr: false });
-export const VideoConferenceRoom = dynamic(() => import('@/components/VideoConference/video-conference'), {
+export const VideoConferenceRoom = dynamic(() => import('@/components/VideoConference'), {
+	ssr: false
+});
+export const ConferenceRoom = dynamic(() => import('@/components/VideoConference/ConferenceRoom/conference-room'), {
 	ssr: false
 });
