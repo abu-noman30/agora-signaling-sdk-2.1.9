@@ -10,7 +10,7 @@ export function generateRTCToken(role, channelName, uid) {
 		channelName,
 		uId,
 		role === 'publisher' ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER,
-		3600,
-		600
+		306000,
+		60000
 	);
 }

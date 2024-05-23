@@ -1,6 +1,6 @@
 export const rtmConfig = {
-  appId: 'ba30fb80865f4abb880bc08efd3c2eee',
-  appCertificate: 'f20dcb28b9da4ad089adcdf3a377caa0',
+  appId: 'f0215e6e86a34ff685b83d8419061013',
+  appCertificate: '04a975b1e60c4228bfc0da713b346518',
   channelName: 'test-channel',
   token: '',
   proxyUrl: 'http://localhost:8080/',

@@ -6,10 +6,12 @@ import { useEffect, useState } from 'react';
 
 export default function LocalUser({ isMuted, setIsMuted }) {
 	const uid = useSearchParams().get('uid');
+	// const token =  generateRTCToken('publisher', rtmConfig?.channelName, uid)
 
 	const { localCameraTrack } = useLocalCameraTrack();
 
 	const [isJoined, setIsJoined] = useState(false);
+
 
 	useJoin(
 		{
