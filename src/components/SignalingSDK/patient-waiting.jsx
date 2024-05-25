@@ -1,6 +1,6 @@
 'use client';
 
-import useSignalEvents from '@/hooks/useSignalEvents-sdk';
+import useAgoraSignalEvents from '@/hooks/useAgoraSignalEvents-sdk';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -18,7 +18,7 @@ function PatientWaiting() {
     notAnsweringCall,
     getUserSubscribeChannels,
     getOnlineUsersInChannel
-  } = useSignalEvents();
+  } = useAgoraSignalEvents();
   const wasCalled = useRef(false);
   const audioRef = useRef(new Audio('ringtone.mp3'));
   const [modalOpen, setModalOpen] = useState(false);
@@ -47,29 +47,29 @@ function PatientWaiting() {
     }
   }, [messageCallback, patientId]);
 
-	useEffect(() => {
-		let timeoutId;
-		if (modalOpen) {
-			timeoutId = setTimeout(() => {
-				if (!isPatientResponding) {
-					audioRef.current.pause();
-					setModalOpen(false);
-					notAnsweringCall(messageCallback);
-				}
-			}, 30000); // 180000 milliseconds = 3 minutes
-		}
-	
-		return () => {
-			clearTimeout(timeoutId);
-		};
-	}, [modalOpen, isPatientResponding, messageCallback]);
+  useEffect(() => {
+    let timeoutId;
+    if (modalOpen) {
+      timeoutId = setTimeout(() => {
+        if (!isPatientResponding) {
+          audioRef.current.pause();
+          setModalOpen(false);
+          notAnsweringCall(messageCallback);
+        }
+      }, 30000); // 180000 milliseconds = 3 minutes
+    }
 
-	useEffect(() => {
-		if (isPatientResponding) {
-			audioRef.current.pause();
-			setModalOpen(false);
-		}
-	}, [isPatientResponding]);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [modalOpen, isPatientResponding, messageCallback]);
+
+  useEffect(() => {
+    if (isPatientResponding) {
+      audioRef.current.pause();
+      setModalOpen(false);
+    }
+  }, [isPatientResponding]);
 
   // console.log('[Patient]: Event Callback', eventCallback);
   // console.log('[Patient]: Message Callback', messageCallback);

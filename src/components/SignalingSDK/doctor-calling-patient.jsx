@@ -1,5 +1,6 @@
 'use client';
-import useSignalEvents from '@/hooks/useSignalEvents-sdk';
+
+import useAgoraSignalEvents from '@/hooks/useAgoraSignalEvents-sdk';
 import { callInvitation } from '@/utils/constants/constans';
 import { rtmConfig } from '@/utils/signaling.config';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,7 +17,7 @@ function DoctorCallingPatient() {
     getUserSubscribeChannels,
     getOnlineUsersInChannel,
     setUserStatus
-  } = useSignalEvents();
+  } = useAgoraSignalEvents();
 
   const wasCalled = useRef(false);
   const router = useRouter();
